@@ -5,7 +5,7 @@ date: "8/30/2021"
 output: rmarkdown::github_document
 ---
 
-```{r}
+```{r Knitr Library}
 library(knitr)
 opts_knit$set(global.par = TRUE)
 ```
@@ -69,18 +69,14 @@ This raw dataset will be stored locally for cleaning and processing via RStudio.
 
 First, in order to view, process and better visualize these datasets, the appropriate tidyverse and other visualization packages must be installed (if so, uncomment line 43) and loaded, which is done so in the following:
 
-```{r echo=FALSE}
+```{r Tidyverse and dplyr, echo=FALSE}
 # Install from CRAN
 #install.packages("tidyverse")
-#install.packages("ggVennDiagram")
-#install.packages("ggcorrplot")
 
 
 # Load tidyverse library and dplyr
 library(tidyverse)
 library(dplyr)
-library(ggVennDiagram)
-library(ggcorrplot)
 
 ```
 
@@ -121,7 +117,7 @@ One problem/shortcoming of this data is that the data was collected prior to the
 
 To begin the process step in our analysis tool of choice (R / RStudio), we first read in the data from the locally stored our .csv files into R with the following code.
 
-```{r}
+```{r Read in CSV Files}
 # Read the selected csv files into R and assigning them variable names
 DS_Candidates_Work_Data <- read.csv("../HR Hiring Analytics of Data Scientists/Raw Datasets/archive/aug_train.csv")
 ```
@@ -132,8 +128,8 @@ As you can tell already tell from this far into this project, this Rmarkdown fil
 
 To continue processing and/or transforming our data, it is imperative we take a closer look at our data and ensure it is clean and ready to be analyzed. Some useful R packages that may be useful to help us accomplish this are "skimr" and "janitor" which are installed and loaded in below.
 
-```{r echo = FALSE}
-## Uncomment the following lines if the "skimr", "janitor" or "gapminder" packages are not yet installed, otherwise, proceed to line 192)
+```{r Skimr and Janitor}
+# Uncomment the following lines if the "skimr" and "janitor" packages are not yet installed, otherwise, proceed to line 192)
 #install.packages("skimr")
 #install.packages("janitor")
 
@@ -143,21 +139,21 @@ library("janitor")
 
 One of the function from these libraries that I prefer using when cleaning dataframe columns is the "clean_names" function. This function is used to ensure all column names are unique, only consist of letter, numbers or the underscore (\_) character and have consistent casing (lower case is preferred over upper case).
 
-```{r include=FALSE}
+```{r Clean Names, include=FALSE}
 #Ensure columns names are all unique, consist of letter, number or the "_" character to seperate words, and consistent lower casing.
 clean_names(DS_Candidates_Work_Data)
 ```
 
 An additional correction that we make is changing the typo of "relevent" to the proper spelling of "relevant" in the the column name.
 
-```{r}
+```{r Rename Typo}
 DS_Candidates_Work_Data <- DS_Candidates_Work_Data %>% 
   rename(relevant_experience = relevent_experience)
 ```
 
 Next, let's preview the first few rows of our new data frame and the newly cleaned column names to make sure we're fully satisfied with the cleaned output of the column names of our "DS_Candidate_Work_Data" dataframe.
 
-```{r}
+```{r Head Preview}
 head(DS_Candidates_Work_Data)
 ```
 
@@ -169,7 +165,7 @@ Due to what identifiers typically represent, we shouldn't expect the need to per
 
 Before we do this, we first check for the max \# of digits/characters in the enrollee_id column, which shall serve as the standard number of digits for this column going forward.
 
-```{r}
+```{r Null and Digit Check}
 #Make sure there are no null values in this column, which could pose a problem later.
 DS_Candidates_Work_Data %>%
   is.na() %>%
@@ -185,7 +181,7 @@ min(nchar(DS_Candidates_Work_Data$enrollee_id))
 
 Knowing that the max \# of chars is 5 and the min \# of chars is 1, we modify the enrollee_id column accordingly.
 
-```{r}
+```{r Standardize ID digit #}
 #We will add leading zero(s) to any value that has 4 or less total characters to adhere to our 5 digit id rule.(E.g. "1" becomes "00001", "199" becomes "00199", etc)
 DS_Candidates_Work_Data_mod1 <- DS_Candidates_Work_Data
 DS_Candidates_Work_Data[1]<- formatC(DS_Candidates_Work_Data$enrollee_id, width = 5, format = "d", flag = "0") 
@@ -195,7 +191,7 @@ DS_Candidates_Work_Data_mod1 <- DS_Candidates_Work_Data
 
 Now the "integer" to "character" type conversion can be performed.
 
-```{r}
+```{r Char/Int Conversion}
 #Convert all the values under the "enrollee_id" column from integers to characters/strings.
 DS_Candidates_Work_Data_mod2 <- DS_Candidates_Work_Data_mod1 %>%
   mutate(enrollee_id = as.character(enrollee_id))
@@ -206,8 +202,8 @@ sapply(DS_Candidates_Work_Data_mod2, class)
 
 Let's continue exploring our data by examining the possible, unique values one could get the non-integer and non-numeric columns of interest. This could indicate where further cleaning can be performed by bringing our attention to any erroneous data. Based on our "head" preview earlier, some columns worth looking further into are "city", "gender", "relevant_experience", "enrolled_university", "education_level", "major_discipline", "company_size", "company_type" and "last_new_job".
 
-```{r}
-#List the unique values for the columns of interest (basically, non-discrete/qualititative columns).
+```{r Unique Check}
+#List the unique values for the columns of interest (basically, non-discrete/qualitative columns).
 print("All possible recorded values for city:") 
   unique(DS_Candidates_Work_Data_mod2$city)
   
@@ -245,7 +241,7 @@ The "city" values look fine. With no observable typos or errors, no further clea
 
 For "gender", we can update the blank values to read "Not disclosed" for further clarity.
 
-```{r}
+```{r Mutate Gender}
 #Mutate/Replace blank value with "Not disclosed"
 DS_Candidates_Work_Data_mod3 <- DS_Candidates_Work_Data_mod2 %>%
   mutate(gender = replace(gender, gender=="", "Not disclosed"))
@@ -256,7 +252,7 @@ unique(DS_Candidates_Work_Data_mod3$gender)
 
 For "relevant_experience", since there are only 2 possible values, this specific column is essentially a binary set of data and we can replace the response "Has relevent experience" with "Y" and replace "No relevent experience" with "N". Also, the original response values to this column have the typo discussed earlier.
 
-```{r}
+```{r Mutate Rel Exp}
 #Mutate/Replace with "Y" or "N" responses accordingly
 DS_Candidates_Work_Data_mod4 <- DS_Candidates_Work_Data_mod3 %>%
   mutate(relevant_experience = replace(relevant_experience, relevant_experience=="Has relevent experience", "Y")) %>%
@@ -268,7 +264,7 @@ unique(DS_Candidates_Work_Data_mod4$relevant_experience)
 
 We apply a similar type of cleaning we previously performed on the "gender" column to the "enrolled_university", "education_level", "major_discipline", "company_type", "experience" and "last_new_job" columns where we replace blank values with "Not Disclosed" or "Not Applicable" depending on the context. This is done for clarity and consistency.
 
-```{r}
+```{r Mutate Rest}
 #Mutate/Replace remaining blank values in other columns with "Not disclosed"
 DS_Candidates_Work_Data_mod5 <- DS_Candidates_Work_Data_mod4 %>%
   mutate(enrolled_university = replace(enrolled_university, enrolled_university=="", "No enrollment data")) %>%
@@ -290,7 +286,7 @@ unique(DS_Candidates_Work_Data_mod5$last_new_job)
 
 For the "company_size" column, there is an obvious typo for one of the values. One company size value reads "10/49" instead of "10-49". This is corrected below.
 
-```{r}
+```{r Mutate Incorrect Comp Size}
 #Mutate/Replace incorrect value. Mutate/Replace blank value with "No data / Not applicable"
 DS_Candidates_Work_Data_mod6 <- DS_Candidates_Work_Data_mod5 %>%
   mutate(company_size = replace(company_size, company_size=="10/49", "10-49")) %>%
@@ -302,13 +298,13 @@ unique(DS_Candidates_Work_Data_mod6$company_size)
 
 Lastly, we perform some final checks on dataframe to ensure there is a matching number of enrollee_ids as there are observations and that there are no duplicate observatons.
 
-```{r}
+```{r Distinct Check}
 #Check the number of distinct enrollee_ids, which should be equal to the number of observations (19,158)
 n_distinct(DS_Candidates_Work_Data_mod6$enrollee_id)
 
 #Check for any duplicated rows
 sum(duplicated(DS_Candidates_Work_Data_mod6))
-
+ 
 ```
 
 ## Analyze
@@ -317,7 +313,7 @@ sum(duplicated(DS_Candidates_Work_Data_mod6))
 
 First, we look at the statistical spread and distribution of our data in this analysis step. The following produces a high level summary.
 
-```{r}
+```{r High Level Summary}
 # High level summary of DS_Candidates_Work_Data
 summary(DS_Candidates_Work_Data_mod6)
 ```
@@ -330,7 +326,7 @@ First, let's examine the "city_development_index", which is directly associated 
 
 Based on the fact that the mean (0.8288) and median (0.9030) CDI values of our data are heavily skewed towards the upper limit/max (0.949), most participants come from a large and highly developed city vs. smaller cities or towns. We visualize the distribution/representation of each city code below.
 
-```{r}
+```{r Limit to 30 Cities}
 #Out of the 123 total cities represented, we create a new table to store the 30 most frequently appearing cities on our "DS_Candidates_Work_Data_mod6" data frame in descending order
 CityData <- DS_Candidates_Work_Data_mod6 %>% 
   group_by(city) %>%
@@ -346,12 +342,12 @@ CityData %>%
 
 Now let's correlate the top 30 most represented cities with their respective CDI metric.
 
-```{r}
+```{r Join on City}
 #First we'll merge (or join) our CityData df with our DS_Candidates_Work_Data_mod6 df based on the "city" value.
 CityDatamod1 <- merge(x = CityData, y = DS_Candidates_Work_Data_mod6, by = 'city', all.x = TRUE) 
 ```
 
-```{r}
+```{r CDI Subset}
 #Next, we create a subset that only displays the top 30 most represented cities and their corresponding CDIs and counts.
 CityDatamod2 <- subset(CityDatamod1, 
               subset = !duplicated(CityDatamod1[c("city", "city_development_index")]),
@@ -361,7 +357,7 @@ CityDatamod2 <- subset(CityDatamod1,
 
 Both the city count and CDI are both plotted in a visualization to further investigate for any potential correlation.
 
-```{r}
+```{r Top 30 Represented Cities }
 CityDatamod2 %>%
   ggplot(aes(x = reorder(city, -city_count), y = city_count, fill=city_development_index)) + geom_bar(stat = "identity")+
   scale_fill_gradientn(colors = c('green', 'yellow', 'red'), values = c(0, 50, 100/100))+
@@ -373,7 +369,7 @@ Judging from how wide a CDI spectrum is represented, our plot above indicates th
 
 However, our work with using our City Data is not over yet. The final piece of this data subset worth exploring involves determining the how the ratio between those looking for a job change (target = 1) and those not looking for a job change (target = 0) varies by our CDI metric.
 
-```{r}
+```{r Subset Target}
 #We will re-use a previous df, CityDatamod1, as it contains all our data of interest. However, this time, we will create a slightly different subset that tallies the number of rows where the target = 1 (aka, participant is looking for a job change).
 CityDatamod3 <- subset(CityDatamod1, 
               select = c("city", "city_development_index", "city_count", "target")) %>%
@@ -382,14 +378,14 @@ CityDatamod3 <- subset(CityDatamod1,
   tally(name="n_job_change")
 ```
 
-```{r}
+```{r Subset Job Change & Ratios}
 #We create a new subset, that removes the duplicate city row (where target = 0) that was created when we used the tally function. Additionally, we create a few new columns: One that counts the number of participants not looking for a job change (n_no_job_change) and the corresponding percentage relevent to the the total from that city (perc_no_job_change), the percentage of particpants looking for job change in that city (perc_job_change) and the ratio between those looking for a job change and those who aren't. The ratio is set up so that any number greater than 1 indicates that there are more people looking for a job change than those who aren't while a number less than 1 indicates the opposite.
 CityDatamod4 <- subset(CityDatamod3, target!="0") %>%
   select(-target) %>%
   mutate(n_no_job_change = city_count-n_job_change, perc_job_change = n_job_change/city_count, perc_no_job_change = (city_count - n_job_change)/city_count, ratio_job_change = n_job_change/n_no_job_change)
 ```
 
-```{r}
+```{r Join on Job Change }
 #Now merge our dfs.
 CityDatamod5 <- merge(x = CityDatamod4, y = DS_Candidates_Work_Data_mod6, by = 'city', all = TRUE) 
 
@@ -405,7 +401,7 @@ CityDatamod6 <- subset(CityDatamod5,
 
 Now, let's try to create a data visualization that illustrates the correlation (if any) between the participant's orgin city, the associated city development index and their level of interest in looking for a new data science job. We shall do this using a scatter plot where the y-axis represents the target ratio and the color/size of each point represents the city and its corresponding CDI.
 
-```{r}
+```{r Top 30 Cities (by Target Ratio)}
 CityDatamod6 %>%
   ggplot(aes(x = reorder(city, -ratio_job_change), y = ratio_job_change, color = city_development_index, size = city_development_index)) + geom_point(stat = "identity", position = "stack")+
   scale_color_gradientn(colors = c('red', 'yellow', 'green'), values = c(0, 50, 100/100))+
@@ -417,7 +413,7 @@ The results are intriguing. Of the top 30 represented cities, only 2 cities (cit
 
 Another metric we calculated was the percentages of people looking for a job change as well as those who were not. This time we'll plot these as seperate density curves overlapped on a single density plot. Instead of identifying the city on the x-axis, we'll plot the CDI values themselves. Also, we'll indicate the mean CDI of the top 30 cities sampled with a dashed purple line, in order to give some perspective in what the percentages look like in the most common cities our Data Science candidates came from.
 
-```{r}
+```{r Top 30 Cities by CDI & Job Change}
 CityDatamod6 %>%
    select(-ratio_job_change) %>% 
    gather(type, identity, perc_job_change:perc_no_job_change) %>% 
@@ -438,14 +434,14 @@ In this part of the data analysis, we'll look beyond where the participant came 
 
 Using the cleaned version of the df that contains all our potential candidates data (DS_Candidates_Work_Data_mod6), we'll create a new df (called EducationData) to store all the columns that may be useful in this section.
 
-```{r}
+```{r Education Data df}
 EducationData <- DS_Candidates_Work_Data_mod6 %>%
   select(enrollee_id, enrolled_university, education_level, major_discipline, experience, training_hours, target)
 ```
 
 Let's visualize the comparison between the different disciplines these potential Data Scientist job candidates majored in through the use of another bar chart.
 
-```{r warning=FALSE}
+```{r Breakdown by Major, warning=FALSE}
 EducationData %>% ggplot(aes(forcats::fct_relevel(major_discipline, c( "No Major", "Arts","Business Degree","Other", "Humanities","Not Applicable", "STEM")), fill=major_discipline)) + 
   geom_bar(stat="count") +
   labs(title = "Major Disciplines for Data Scientist Course Participants", x = "Count", y = "Major Discipline", fill = "Major Discipline") + 
@@ -458,7 +454,7 @@ Those individuals with STEM backgrounds generally have a considerable amount mor
 
 However, because having a more relevant background may sometimes not be enough to prepare or qualify an individual new to Data Science, it is important to also take a look at the distribution of the amount of training hours in Data Science each person had gone through. A histogram would be helpful visualization for this which is what we plot below.
 
-```{r warning=FALSE}
+```{r Breakdown by Total Amount of Training Hrs, warning=FALSE}
 EducationData %>% ggplot(aes(x= training_hours)) + 
   geom_histogram(aes(fill= ..count.. ), binwidth=20, stat="bin", lwd = 0.2) + 
   scale_x_continuous(name = "Training Hours ", breaks = seq(0, 340, 10), limits=c(0, 340)) +
@@ -474,7 +470,7 @@ As shown by our histogram, most of those who participated in the company's data 
 
 Now that we've realized the the significant STEM major representation as well as the distribution of total training hours, we move on to evaluating the education level and current university enrollment. The data visualizations for these are presented below.
 
-```{r}
+```{r Breakdown by Univ Enrollemnt Status}
 EducationData %>%  ggplot(aes(x = enrolled_university, fill = enrolled_university))+
   geom_bar(stat = "count") +
   labs(title = "University Enrollment Status Among Data Science Candidates",  x = "Enrollment Status", y = "Count", fill = "Enrollment Status") +
@@ -482,7 +478,7 @@ EducationData %>%  ggplot(aes(x = enrolled_university, fill = enrolled_universit
 
 ```
 
-```{r}
+```{r Breakdown by High Edu Level}
 EducationData %>%  ggplot(aes(x = education_level, fill = education_level))+
   geom_bar(stat = "count") +
   labs(title = "Highest Education Level Completed Among Data Science Candidates",  x = "Education Level", y = "Count", fill = "Enrollment Education") +
@@ -500,14 +496,14 @@ If Data Science participants of this educational background/history appear to be
 
 However, the correlation between our education data and the company targets still needs further investigation in order to establish that, in addition to registration, the company is achieving their goal, from a hiring perspective as well.
 
-```{r}
+```{r Unite Enroll, High Edu Level & Major}
 #Create a modified dataframe that "unites" the current enrollment status, highest education level completed and major into a single column. 
 EducationDatamod1 <- EducationData %>%
   unite(enroll_eduLevel_maj, enrolled_university, education_level, major_discipline, sep = ", ")
 ```
 
 Then, the target column is translated from a numeric to string/character per the following key: 0 - "Not looking for new job" & 1 - "Looking for new job"
-```{r}
+```{r Mutate Target Value}
 EducationDatamod2<- EducationDatamod1 %>%
   mutate(target= ifelse(as.character(target) == "0", "Not looking for new job", as.character(target))) %>%
   mutate(target= ifelse(as.character(target) == "1", "Looking for new job", as.character(target))) %>%
@@ -518,7 +514,7 @@ EducationDatamod2<- EducationDatamod1 %>%
 
 Create a modified dataframe that counts the frequency of each combination education data and stores only the 20 most frequent results (minimum sample size of 100 for each group/combination of enrollment status, highest level of education and major) .
 
-```{r}
+```{r Arrange Desc Top 20 Head}
 EducationDatamod3 <- EducationDatamod2 %>% 
   group_by(enroll_eduLevel_maj) %>% 
   summarise(Freq=n()) %>% 
@@ -527,13 +523,13 @@ EducationDatamod3 <- EducationDatamod2 %>%
 ```
 
 Then perform a merge using the last 2 modified dataframes we created.
-```{r}
+```{r Join on Enroll, Edu Level & Maj}
 EducationDatamod4 <- merge(x = EducationDatamod3, y = EducationDatamod2, by = 'enroll_eduLevel_maj', all.x = TRUE) 
 ```
 
 Followed by the series of subset creation per a similar process to what was done earlier in Part 1.
 
-```{r}
+```{r Subset Top 20 Academic Background}
 #Next, we create a subset that contains only the columns of interest
 EducationDatamod5 <- subset(EducationDatamod4,
                      select = c("enroll_eduLevel_maj", "Freq", "training_hours", "job_search_status"))
@@ -559,8 +555,7 @@ EducationDatamod8 <- subset(EducationDatamod7,
 ```
 
 The visualization of the most common  academic backgrounds (where n > 100) with respect to the target job search metrics is shown below. Again, the target ratio is defined as the percentage of those looking for a new job over the percentage not looking for a new job.
-```{r}
-par(mar=c(5,5,0,0))
+```{r Target Ratios by Academic Background}
 EducationDatamod8 %>% ggplot(aes(x=reorder(enroll_eduLevel_maj, ratio_job_change ), y=ratio_job_change, fill=enroll_eduLevel_maj )) + 
     geom_bar(position="dodge", stat="identity", alpha = 0.5) +
   ylim(0,1) +
@@ -572,7 +567,7 @@ EducationDatamod8 %>% ggplot(aes(x=reorder(enroll_eduLevel_maj, ratio_job_change
 As we can see from our polar coordinate bar plot, Full time enrolled Graduate students majoring in a STEM degree are most likely to be looking for a new job, followed closely by not currently enrolled Graduate Stem (perhaps recently graduated). There appears to be a significant gap following these two groups. 
 
 What still needs to be accounted for is the average total amount of Data Science training hours spent by each academia group. We create a final EducationData df below that averages these values for each of the 20 groups examined.
-```{r}
+```{r Join on Avg Training Hours}
 EducationDatamod9 <- EducationDatamod5 %>%
     group_by(enroll_eduLevel_maj) %>% 
     summarise_each(funs(mean=mean(training_hours, na.rm=TRUE))) %>%
@@ -584,7 +579,7 @@ EducationDatamod10 <- merge(x = EducationDatamod9, y = EducationDatamod8, by = '
 
 We visualize this new df next using a scatter plot of the mean total training hours for each academic background group and the corresponding target ratio. 
 
-```{r}
+```{r Target Ratio vs. Average Tot Training Hours}
 EducationDatamod10 %>% ggplot(aes(x = training_hours_mean, y = ratio_job_change, color = enroll_eduLevel_maj)) +
   geom_point(stat = "identity") +
   labs(title = "Target Ratio vs. Average Total Training Hours", subtitle = "By Academic Background",   x = "Average Total Training Hours", y = "Target Ratio", color = "Academic Background") +
@@ -598,7 +593,7 @@ All the academic backgrounds where the target ratio is greater than 0.5 or less 
 
 In this final part of the analysis section, we'll examine the the enrollee's current or previous work experience and the pertinent information involving their work as a factor in whether or not they are looking for a new job. Starting with our DS_Candidates_Work_Data_mod6 dataframe, we'll trim down to a more concise df that captures just the columns of interest for this section.
 
-```{r}
+```{r Work Exp Data df}
 WorkExpData <-DS_Candidates_Work_Data_mod6 %>%
   select(relevant_experience, experience, company_size, company_type, last_new_job, target)
   
@@ -606,7 +601,7 @@ WorkExpData <-DS_Candidates_Work_Data_mod6 %>%
 
 One thing that was observed while parsing through and reviewing our new WorkExpData df, is that the values under the Experience column can be further modified/cleaned up. Currently, these values is a max of discrete values for the # of work experience each potential candidate has as well as comparative value if the # is above or below a certain threshold (< 1 or > 20). From personal experience, there isn't much of a difference between someone with 7 years of experience vs. one with 8 years. Therefore, it may be more useful and convenient to group the years of experience by intervals of 5 as follows. Additionally, we rename the values for "0" and "1" as "Not looking for new job" and "Looking for new job" respectively
   
-```{r warning=FALSE}
+```{r Mutate Exp & Target, warning=FALSE}
 WorkExpDatamod1 <-WorkExpData %>%
   mutate(experience = replace(experience, as.numeric(experience) >= 1 & as.numeric(experience) <= 5, "1 - 5")) %>%
   mutate(experience = replace(experience, as.numeric(experience) > 5 & as.numeric(experience) <= 10, "6 - 10")) %>%
@@ -625,14 +620,14 @@ WorkExpDatamod2<-WorkExpDatamod1[!(WorkExpDatamod1$experience=="No data / Not ap
 ```
 
 Then we prepare another modified dataframe that counts the number corresponding with to the target value (whether or not there is interest in looking for a new job)
-```{r}
+```{r Tally Target Count by Exp}
 WorkExpDatamod3 <- WorkExpDatamod2 %>%
   group_by(relevant_experience, experience, target) %>%
   tally(name = "target_count") 
 
 ```
 
-```{r}
+```{r Rel and # of Years exp vs. Job Change interest}
 #Re-order the years of experience in increasing order.
 WorkExpDatamod3$experience <- factor(WorkExpDatamod3$experience, levels = c("<1", "1 - 5", "6 - 10", "11 - 15", "16 - 20", ">20"))
 
@@ -648,7 +643,7 @@ Based on our visualization, we see that the group we expect to see largest numbe
 
 Now, let's focus on the information we have regarding the current companies that each course participant works for by creating another modified df for this. Company size and company type are the specific parameters we are interested in as we count the # of individuals interested/disinterested in finding a new job.
 
-```{r}
+```{r Tally Target Count by Company Type/Size}
 #Perform count for each of the target values.
 WorkExpDatamod4 <- WorkExpDatamod2 %>%
   group_by(company_size, company_type, target) %>%
@@ -661,7 +656,7 @@ WorkExpDatamod4$company_size <- factor(WorkExpDatamod4$company_size, levels = c(
 
 We create a facet wrap bar graph below, broken down by company type with company size on the x-axis.
 
-```{r}
+```{r Company Type & Size vs. Job Change interest}
 WorkExpDatamod4 %>%
   ggplot(aes(x=company_size, y =target_count, fill = target )) +
   geom_bar(stat = "identity", width = 0.75) +
@@ -672,7 +667,7 @@ WorkExpDatamod4 %>%
 ```
 Clearly based on the results above, it is no surprise that a majority who don't currently have a company type or size identified (or no data was provided), would consist largely comprise the # of participants looking for a new job/job change (58%). Therefore, to remove we'll remove this in a new modified df and re-plot accordingly since it was clearly obvious. It's removal will also help to to uncover more hidden insight.
 
-```{r}
+```{r Company Type & Size vs. Job Change interest (remove misc)}
 #Remove the "No data / Not applicable" group from company_type
 WorkExpDatamod5<-WorkExpDatamod4[!(WorkExpDatamod4$company_type=="No data / Not applicable"),]
 

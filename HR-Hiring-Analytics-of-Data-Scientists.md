@@ -213,6 +213,15 @@ analyzed. Some useful R packages that may be useful to help us
 accomplish this are “skimr” and “janitor” which are installed and loaded
 in below.
 
+``` r
+# Uncomment the following lines if the "skimr" and "janitor" packages are not yet installed, otherwise, proceed to line 192)
+#install.packages("skimr")
+#install.packages("janitor")
+
+library("skimr")
+library("janitor")
+```
+
     ## 
     ## Attaching package: 'janitor'
 
@@ -355,7 +364,7 @@ preview earlier, some columns worth looking further into are “city”,
 “company\_type” and “last\_new\_job”.
 
 ``` r
-#List the unique values for the columns of interest (basically, non-discrete/qualititative columns).
+#List the unique values for the columns of interest (basically, non-discrete/qualitative columns).
 print("All possible recorded values for city:") 
 ```
 
@@ -726,7 +735,7 @@ CityData %>%
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Limit%20to%2030%20Cities-1.png)<!-- -->
 
 Now let’s correlate the top 30 most represented cities with their
 respective CDI metric.
@@ -755,7 +764,7 @@ CityDatamod2 %>%
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Top%2030%20Represented%20Cities-1.png)<!-- -->
 
 Judging from how wide a CDI spectrum is represented, our plot above
 indicates that there is not a very strong correlation between CDI and
@@ -818,7 +827,7 @@ CityDatamod6 %>%
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Top%2030%20Cities%20(by%20Target%20Ratio)-1.png)<!-- -->
 
 The results are intriguing. Of the top 30 represented cities, only 2
 cities (city\_11 & city\_21) had ratios greater than 1. This indicates
@@ -852,7 +861,7 @@ CityDatamod6 %>%
             color="purple", linetype="dashed", size=0.75)
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Top%2030%20Cities%20by%20CDI%20&%20Job%20Change-1.png)<!-- -->
 
 To conclude the results of this section’s analysis, we should generally
 expect candidates who are currently residing in relatively lower CDI
@@ -891,7 +900,7 @@ EducationData %>% ggplot(aes(forcats::fct_relevel(major_discipline, c( "No Major
   geom_text(aes(label = ..count..), stat= "count", vjust = 0.5, size=3)
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Breakdown%20by%20Major-1.png)<!-- -->
 
 We can immediately observe that the majors of a large portion (75.6%) of
 the Data Science Course participants were of STEM (Science, Technology,
@@ -919,7 +928,7 @@ EducationData %>% ggplot(aes(x= training_hours)) +
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Breakdown%20by%20Total%20Amount%20of%20Training%20Hrs-1.png)<!-- -->
 
 As shown by our histogram, most of those who participated in the
 company’s data science courses only had between 10 to 30 hours of
@@ -941,7 +950,7 @@ EducationData %>%  ggplot(aes(x = enrolled_university, fill = enrolled_universit
    geom_text(aes(label = ..count..), stat = "count", vjust = -0.3, colour = "black")
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Breakdown%20by%20Univ%20Enrollemnt%20Status-1.png)<!-- -->
 
 ``` r
 EducationData %>%  ggplot(aes(x = education_level, fill = education_level))+
@@ -950,7 +959,7 @@ EducationData %>%  ggplot(aes(x = education_level, fill = education_level))+
    geom_text(aes(label = ..count..), stat = "count", vjust = -0.3, colour = "black")
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Breakdown%20by%20High%20Edu%20Level-1.png)<!-- -->
 
 As we can clearly see from the data visualizations above, in regards to
 education background, the most common participant (by % of each
@@ -1038,7 +1047,6 @@ Again, the target ratio is defined as the percentage of those looking
 for a new job over the percentage not looking for a new job.
 
 ``` r
-par(mar=c(5,5,0,0))
 EducationDatamod8 %>% ggplot(aes(x=reorder(enroll_eduLevel_maj, ratio_job_change ), y=ratio_job_change, fill=enroll_eduLevel_maj )) + 
     geom_bar(position="dodge", stat="identity", alpha = 0.5) +
   ylim(0,1) +
@@ -1047,7 +1055,7 @@ EducationDatamod8 %>% ggplot(aes(x=reorder(enroll_eduLevel_maj, ratio_job_change
   theme(axis.text=element_text(size=7), axis.title=element_text(size=10), legend.position="none")
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Target%20Ratios%20by%20Academic%20Background-1.png)<!-- -->
 As we can see from our polar coordinate bar plot, Full time enrolled
 Graduate students majoring in a STEM degree are most likely to be
 looking for a new job, followed closely by not currently enrolled
@@ -1098,7 +1106,7 @@ EducationDatamod10 %>% ggplot(aes(x = training_hours_mean, y = ratio_job_change,
  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.position="none")
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Target%20Ratio%20vs.%20Average%20Tot%20Training%20Hours-1.png)<!-- -->
 All the academic backgrounds where the target ratio is greater than 0.5
 or less than 0.2 are specifically labeled in our scatter plot.Based on
 our visualization, it is clear that full time enrolled participant
@@ -1190,7 +1198,7 @@ WorkExpDatamod3 %>%
   geom_text(aes(label = target_count), stat = "identity", vjust = -.25, colour = "black", size = 2.5)
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Rel%20and%20#%20of%20Years%20exp%20vs.%20Job%20Change%20interest-1.png)<!-- -->
 Based on our visualization, we see that the group we expect to see
 largest number of potential candidates with interest in finding a new
 Data Science job with previous relevant experience is the 6 - 10 years
@@ -1227,7 +1235,7 @@ WorkExpDatamod4 %>%
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Company%20Type%20&%20Size%20vs.%20Job%20Change%20interest-1.png)<!-- -->
 Clearly based on the results above, it is no surprise that a majority
 who don’t currently have a company type or size identified (or no data
 was provided), would consist largely comprise the \# of participants
@@ -1256,7 +1264,7 @@ WorkExpDatamod7 %>%
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
-![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
+![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Company%20Type%20&%20Size%20vs.%20Job%20Change%20interest%20(remove%20misc)-1.png)<!-- -->
 From our new and improved faceted bar graph, we can see that a majority
 of our participants overwhelmingly come from private limited companies
 of all sizes. Regardless of the size of the company or the the company
