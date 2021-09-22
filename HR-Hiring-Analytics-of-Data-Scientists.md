@@ -32,11 +32,11 @@ which of these candidates who completed the course are interested in
 working for the company or looking for a new employment. This should
 effectively lead to a better strategic allocation of, if not a reduction
 in, the cost and time spent on planning, registration of the training
-and affect its quality. Further tailoring of the courses can also be
-done once the company has better understanding of this. All of the
-candidate’s information related to demographics, education, experience,
-etc are gathered upon course registration and can be used for this
-analysis.
+and other controllable factors that can affect the overall course
+quality. Further tailoring of the courses can also be done once the
+company has better understanding of this. All of the candidate’s
+information related to demographics, education, experience, etc are
+gathered upon course registration and can be used for this analysis.
 
 ## Data Analysis Process
 
@@ -79,12 +79,15 @@ below:
 
 As discussed, this dataset was collected and designed by an unnamed Big
 Data company in order for their HR department to understand the factors
-that lead a person to leave current job (AKA turnover). Through their
-model’s analysis of the current credentials, demographics, experience
-data, the probability the course participant is also looking for a new
-job or is willing work for the company can be predicted. Other
-parameters can be further interpreted in order to understand the
-competition that exists within the data scientist hiring landscape.
+and professional/academic characteristics of those looking to leave
+current job (AKA turnover) for a different data science position at
+another company or simply make a career change into Data Science .
+Through the company’s gathered data of the current credentials,
+demographics, experience data, the likelihood the course participant is
+also looking for a new job or is willing work for the company can be
+predicted. Other correlations in the data can be further investigated in
+order to understand the turnover rate / career change trends that exists
+within the data scientist hiring landscape.
 
 ## Prepare
 
@@ -841,7 +844,7 @@ with a higher CDI.
 
 Another metric we calculated was the percentages of people looking for a
 job change as well as those who were not. This time we’ll plot these as
-seperate density curves overlapped on a single density plot. Instead of
+separate density curves overlapped on a single density plot. Instead of
 identifying the city on the x-axis, we’ll plot the CDI values
 themselves. Also, we’ll indicate the mean CDI of the top 30 cities
 sampled with a dashed purple line, in order to give some perspective in
@@ -856,7 +859,7 @@ CityDatamod6 %>%
    geom_density(stat="identity", alpha=0.5) +
   labs(title = "Top 30 Represented Cities Among Data Science Candidates", subtitle ="Parameterized by CDI & Interest in Job Change (%)", x = "CDI", y = "% Interest") +
   scale_fill_discrete("Job Interest", 
-                      labels=c("Looking for Job Change", "Not Looking for Job Change")) +
+                      labels=c("Not looking for Job Change", "Looking for Job Change")) +
   theme(axis.text.x = element_text(angle = 0)) + geom_vline(aes(xintercept=mean(city_development_index)),
             color="purple", linetype="dashed", size=0.75)
 ```
@@ -897,7 +900,8 @@ another bar chart.
 EducationData %>% ggplot(aes(forcats::fct_relevel(major_discipline, c( "No Major", "Arts","Business Degree","Other", "Humanities","Not Applicable", "STEM")), fill=major_discipline)) + 
   geom_bar(stat="count") +
   labs(title = "Major Disciplines for Data Scientist Course Participants", x = "Count", y = "Major Discipline", fill = "Major Discipline") + 
-  geom_text(aes(label = ..count..), stat= "count", vjust = 0.5, size=3)
+  geom_text(aes(label = ..count..), stat= "count", vjust = 0.5, size=3) +
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Breakdown%20by%20Major-1.png)<!-- -->
@@ -947,7 +951,8 @@ data visualizations for these are presented below.
 EducationData %>%  ggplot(aes(x = enrolled_university, fill = enrolled_university))+
   geom_bar(stat = "count") +
   labs(title = "University Enrollment Status Among Data Science Candidates",  x = "Enrollment Status", y = "Count", fill = "Enrollment Status") +
-   geom_text(aes(label = ..count..), stat = "count", vjust = -0.3, colour = "black")
+   geom_text(aes(label = ..count..), stat = "count", vjust = -0.3, colour = "black") +
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Breakdown%20by%20Univ%20Enrollemnt%20Status-1.png)<!-- -->
@@ -956,7 +961,8 @@ EducationData %>%  ggplot(aes(x = enrolled_university, fill = enrolled_universit
 EducationData %>%  ggplot(aes(x = education_level, fill = education_level))+
   geom_bar(stat = "count") +
   labs(title = "Highest Education Level Completed Among Data Science Candidates",  x = "Education Level", y = "Count", fill = "Enrollment Education") +
-   geom_text(aes(label = ..count..), stat = "count", vjust = -0.3, colour = "black")
+   geom_text(aes(label = ..count..), stat = "count", vjust = -0.3, colour = "black") +
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Breakdown%20by%20High%20Edu%20Level-1.png)<!-- -->
@@ -1195,7 +1201,7 @@ WorkExpDatamod3 %>%
   geom_bar(stat = "identity", width = 0.75) +
   facet_grid(~experience) +
   labs(title = "Relevance & Number of Years Experience vs. Interest in Job Change", x = "Relevant Experience?", y = "Count", fill = "Job Change Interest") +
-  geom_text(aes(label = target_count), stat = "identity", vjust = -.25, colour = "black", size = 2.5)
+  geom_text(aes(label = target_count), stat = "identity",  colour = "black", size = 2.5, vjust=1.5, position = position_stack())
 ```
 
 ![](HR-Hiring-Analytics-of-Data-Scientists_files/figure-gfm/Rel%20and%20#%20of%20Years%20exp%20vs.%20Job%20Change%20interest-1.png)<!-- -->
@@ -1231,7 +1237,7 @@ WorkExpDatamod4 %>%
   geom_bar(stat = "identity", width = 0.75) +
   facet_wrap(~company_type) +
   labs(title = "Current Company Type & Size vs. Interest in Job Change", x = "Company Size", y = "Count", fill = "New Job  Interest") +
-  geom_text(aes(label = target_count), stat = "identity", vjust = -.25, colour = "black", size = 2.5) +
+  geom_text(aes(label = target_count), stat = "identity", vjust = 2, colour = "black", size = 2.5, position = position_stack()) +
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
@@ -1260,7 +1266,7 @@ WorkExpDatamod7 %>%
   geom_bar(stat = "identity", width = 0.75) +
   facet_grid(~company_type) +
   labs(title = "Current Company Type & Size vs. Interest in Job Change", x = "Company Size", y = "Count", fill = "New Job  Interest") +
-  geom_text(aes(label = target_count), stat = "identity", vjust = -.80, colour = "black", size = 2.5) +
+  geom_text(aes(label = target_count), stat = "identity", vjust = 2, colour = "black", size = 2, position = position_stack()) +
   theme(axis.text.x = element_text(angle = 90)) 
 ```
 
@@ -1279,4 +1285,178 @@ aren’t sufficient or definitive enough.
 
 ## Share
 
+The preferable method of sharing these findings would be to do so using
+the RMarkdown file (.rmd) and publishing the documented analysis process
+and findings on an online Data Science community such as Kaggle or via
+personal online portfolio. The company that collected the data scientist
+course data is unnamed so there is no use in trying to reach out and
+share the insights documented on this R Markdown notebook. The selected
+method I’ve chosen to share his project is via Github and personal Data
+Analysis portfolio. With the in-line R code/chunks used throughout the
+case study documentation and analysis process, making sharing this .rmd
+file convenient to publish, Github is equipped with the appropriate
+kernals to run the code and create the visualizations as intended. Also,
+as a popular version control tool, this analysis is easily accessible
+andsimple to revisit and update as necessary.
+
 ## Act
+
+To reiterate, the purpose of this analysis was to help identify what
+sort of academic, professional or background traits typify course
+registrants looking to find a Data Science position within the company
+offering this course. This could be anything from the turnover of an
+experienced Data Scientists with years of relevant experience or a fresh
+(or even currently enrolled) college student looking to find their first
+job in the field. The overall goal is to help this company understand
+and fulfill its hiring needs by correlating the vast backgrounds of it’s
+many participants with that of someone looking to work for this company.
+All three parts of our analysis reveal some key insights that could help
+the Human Resources department of the unnamed Big Data company with
+their recruitment for potential new Data Scientists.
+
+In the first part of our analysis we evaluated each participant’s city
+of origin and the associated City Development Index (CDI). CDI is a
+measure of a city’s level of development in areas such as
+infrastructure, education and health. As revealed by this section of the
+analysis, one may be able to expect that candidates originating from a
+city with a CDI less than 0.65 are more likely to be looking/interested
+in a new job versus candidates that are content with their current
+situation in a city with a relatively higher CDI. Looking for a new job
+vs. not looking for a new job largely correlates with the decision of to
+move to a new city. A candidate who is unhappy with their living
+situation (we can typically expect CDI is an indicator of how well a
+city can provide the quality of life one looks for), may try to find a
+new job in another city that satisfies their quality of life standards
+and expectations. One main takeaway for HR from these results is that
+they are more likely to find new candidates interested in positions at
+their company with them from these types of cities where CDI is
+typically lower. Obviously this assumes that the company itself is
+located in a city with a higher CDI and would be willing to potentially
+cover a relocation package to that new city, which can be costly.
+However no information was provided in regards to the unnamed company’s
+location/CDI and further exploration will be needed. In addition,
+another limitation and note to consider about basing candidate’s job
+change interest (or disinterest) is that the qualifications of the
+candidate (in terms of their academic background and any relevant
+experiences) are not yet taken into account. Fortunately, we address
+these areas in the subsequent analysis sections.
+
+The potential candidates academic background is closely considered and
+evaluated in Part 2 of this analysis. We examine attributes such as
+highest level of education completed, major discipline, \# of training
+hours completed and whether the participant is currently enrolled as a
+student (part time or full time) or not at all. Because of the technical
+and math-intensive nature of Data Science, it wasn’t too surprising to
+discover that a significant majority of course participants had come
+from a STEM background in college.The \# of training hours completed for
+Data Science wasn’t too signficant, however, as the average total \# of
+training hours came out to roughly 10-30 hours. In this context,
+training hours refer to any learning time (excluding college enrolled
+course or through a on-the-job learning experience through a current
+employer) that is focused and geared to learning Data Science. For
+example, this could even refer to taking the Data Science offered course
+by the Big data company itself. Typically those who don’t have relevant
+job experience or did not specifically major/specialize in Data Science
+while in College would require more training hours (how much exactly
+requires further investigation and is not within this analysis scope).
+Therefore, we can suppose that quite a bit of these candidates received
+their Data Science learning mostly through college or relevant
+experience, or that those without as strong of a background/experience
+in it, did not invest as many hours to learn the discipline. The former
+is further reinforced as our subsequent data visualizations show that a
+majority of participants are already college graduates (bachelors) that
+are not currently enrolled in any full time or part time coursework for
+higher education (i.e. masters or PHd in data science or related).
+
+Of the various combinations of academic backgrounds that the course
+participants represented, we identifed the 20 most common combinations
+of (current enrollment and type, highest education level completed and
+college major, if applicable) and grouped them to assess correlations
+with their target ratio. We defined target ratio as the ratio between
+whether a participants is looking for a new job vs. not looking for a
+new job. Our polor coordinate bar graph revealed that the top 2 academic
+background groups with the highest ratio represented participants who
+had already graduated from college (bachelors) with a STEM degree. The
+difference between the first (76.4%) and second (75.2%) highest ratio
+groups is whether that the former is currently full time enrolled. The
+subsequent scatter plot further clarifies the difference between these
+two academic groups as the group where no enrollment is specified
+(presumably no enrollment) has a considerably higher average amount of
+training hours versus the full time enrolled group. This is easily
+explainable by the amount of free time a non-enrolled person would have
+versus that of someone who is a full time student. Despite this, it is
+clear that those who have already earned a STEM college degree (graduate
+only) are expected to be more interested in finding a new Data Science
+job than those who majored in something such as the Arts, Humanities or
+Business and/or did not complete college (highest education level is
+primary or high school). Interestingly, those with STEM backgrounds but
+have PHDs also represent a group that has a low target ratio. Perhaps,
+it can be inferred that a different field (perhaps academic/university
+research in specialized Data Science topics such as Machine Learning,
+AI, etc) is more suited and aligned for their professional goals.
+Therefore, it is recommended that the big data company considers the
+Graduate STEM (presumably bachelors, not masters or PHD) group as a
+“sweet spot” , in terms of gauging the overall job change interest
+levels across the represented academic groups.
+
+Academics aside, the current and prior work experience for these
+potential candidates is also crucial to evaluate as it provides
+practical knowledge of how to apply Data Science in a real world
+setting. This is the specific area we hone in on in Part 3 of our
+analysis. The first plot we created was a side by side bar graph that
+showed the count of the number of people who were interested in finding
+a new job, not interested in finding a new job, as broken up by whether
+they had relevant Data Science job experience and additionally faceted
+by the range for the \# years of experience. One important insight that
+we learn from this data visualization is that the 1-5 and 6-10 years of
+experience groups largely comprise the total course participants.
+Between these two groups, a larger proportion of participants with
+between 1-5 years of experience are more interested in finding a new
+career vs. having no interest. As the total number of years of
+experience increase, the gap between the count of those with relevant
+experience and those without relevant experience significantly widens.
+This means that people who are looking to making a career change,
+typically do so at a younger age with either &lt;1 years of total
+experience or 1-5 years of total experience. It is shown to be rare that
+someone with 20+ years of experience (irrevelant to data science) would
+be looking to make a career shift to Data Science after participating in
+the companys data science coursework. Other than the group with &lt;1
+year of relevant experience (where the count is exactly equal), the
+remaining groups show that the count not looking for a career change in
+data science (whether this be turnover to a new company as a current
+data scientist or a career change) exceeds (sometimes drastically) the
+count for those that are looking for a new job. This tells us that in
+order to more successfully recruit experienced Data Scientists, the
+company should look into career opportunities that already established
+data science desire at later stages of their career. Perhaps this may
+mean increased leadership opportunities or roles in mentoring younger
+data scientists. There are obviously increased roles and
+responsibilities that go along with the levels/years of experience.
+There are only a limited number of these “higher” level roles in a
+company (not everyone can be a lead data analyst/data manager). Having
+such a role in your current company, more likely roots you into staying
+vs. early/mid career data scientists with less than 10 years of
+experience, who can find similar increased roles through job changes.
+Therefore, the company should understand the general difficulty in
+recruiting more experienced data scientists compared to earlier/mid
+career data scientists simply due to the various structures and
+organizations that exist.
+
+Another plot we created in this section is a faceted bar graph that
+illustrates a side by side bar graph and breakdown of the current
+company types/sizes that the potential candidates work for. By far, most
+participants who currently work, are employed by a Private Limited
+company of all various sizes. The 3 most common company sizes were those
+between 50-99 employees (relatively small), 100 - 500 (small) and
+10,000+ (very large). The other company types we examined were early
+stage startups, funded startups, NGOs and the public sector.
+Unfortunately there was simply no stand out in that for all the various
+company types and sizes, the ratio between current employees not looking
+for a new job far exceeded those that were actually were searching.
+However, it was observed that overall, the target ratio between interest
+in a new job vs. no interest was generally higher for Private Limited
+companies as opposed to the remaining company types. There tends to be a
+negative connotation when it comes the term “corporation”. Therefore, it
+may be worth exploring company culture as a factor in employee
+retention. However, this is not specific to data scientists but for all
+types of employees.
